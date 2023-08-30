@@ -11,11 +11,33 @@ class IpData
     @macAddress
   end
 end
+
+ipString = nil
+localIPString = nil
+
+input_array = ARGV
+input_array.each {|arg|
+  puts arg
+ if arg.match /arp.txt/
+    puts "arp found"
+   localIPString = File.read(arg)
+ end
+ if arg.match /ipconfig.txt/
+   puts "ipconfig found"
+   ipString = File.read(arg)
+ end
+}
+
+
 #ipconfig
-ipString = `ipconfig`
+if ipString.nil?
+  ipString = `ipconfig`
+end
 puts ipString
 #get list of ip and mac addresses on network
-localIPString = `arp -a`
+if localIPString.nil?
+  localIPString = `arp -a`
+end
 puts localIPString
 
 ipArr= []
