@@ -16,21 +16,24 @@ ipString = `ipconfig`
 puts ipString
 #get list of ip and mac addresses on network
 localIPString = `arp -a`
-ipLineCount = localIPString.lines.count - 3
-count = 0
-ipArr= Array.new(ipLineCount)
+puts localIPString
+
+ipArr= []
 #parse string to find just ip and mac addresses
 localIPString.each_line do|line|
-  if count>2
-    ip = line[2,15]
-    mac = line[24,17]
-    newIP = IpData.new(ip, mac)
-    ipArr[count-3] = newIP
+  if line.match /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/
 
+    if  line.match /\w{2}-\w{2}-\w{2}-\w{2}-\w{2}-\w{2}/
+
+      ip = line.match /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/
+      mac = line.match /(\w{2}-\w{2}-\w{2}-\w{2}-\w{2}-\w{2})/
+      newIP = IpData.new(ip, mac)
+      ipArr << newIP
+
+    end
   end
-  count = count+1
 end
-count = 0
+
 ipNum = ipArr.count
 puts "Number of potential IP addresses: #{ipNum} "
 puts
@@ -63,8 +66,8 @@ puts
 ipArr.each{|thisIP|
 
   pings.each{|ping|
-
-    if ping.include? thisIP.getIP.strip
+    ip = thisIP.getIP
+    if ping.include? ip[1]
       if ping.include? "Destination host unreachable" or ping.include? "Request timed out"
         puts "ip: #{thisIP.getIP} MAC Address: #{thisIP.getMac} Ping: Unsuccessful"
       else
